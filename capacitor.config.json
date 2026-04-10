@@ -1,0 +1,20 @@
+{
+  "appId": "com.michel.garlandat.ComedieFrancaise",
+  "appName": "Comedie française",
+  "webDir": "App/public",
+  "bundledWebRuntime": false,
+  "backgroundColor": "#3D0810",
+  "ios": {
+    "backgroundColor": "#3D0810",
+    "contentInset": "automatic",
+    "scrollEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    },
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

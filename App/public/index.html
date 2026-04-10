@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Comédie-Française</title>
+<style>
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --rouge: #6B0F1A;
+  --rouge-dark: #3D0810;
+  --rouge-mid: #8B1525;
+  --or: #C9A84C;
+  --or-light: #E8C97A;
+  --or-pale: #F5E9C8;
+  --creme: #FAF4E8;
+  --texte: #2C1810;
+  --blanc: #FFFFFF;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body { font-family: Georgia, 'Times New Roman', serif; background:var(--rouge-dark); overflow:hidden; height:100vh; }
+
+#app {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  display:flex; flex-direction:column;
+  padding-top:var(--safe-top);
+  background:var(--rouge-dark);
+}
+
+/* ═══════════════════ HEADER ═══════════════════ */
+.header {
+  background: linear-gradient(180deg, #2A0508 0%, var(--rouge-dark) 100%);
+  padding: 10px 50px 10px 16px;
+  flex-shrink:0;
+  border-bottom: 1.5px solid var(--or);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+.header-mask {
+  width: 44px; height: 44px; flex-shrink:0;
+  background: linear-gradient(135deg, var(--or), var(--or-light));
+  border-radius: 50%;
+  display: flex; align-items:center; justify-content:center;
+  font-size: 22px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.header-text {}
+.header-title {
+  font-size: 17px; font-weight: bold;
+  color: var(--or);
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+.header-subtitle {
+  font-size: 10px; color: var(--or-light);
+  opacity: 0.75; letter-spacing: 1.5px;
+  text-transform: uppercase; margin-top: 2px;
+}
+.btn-settings {
+  position: absolute; right: 12px; top: 50%; transform:translateY(-50%);
+  width:34px; height:34px; border-radius:50%;
+  background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3);
+  color: var(--or); font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ═══════════════════ TAB BAR ═══════════════════ */
+.tabbar {
+  display:flex; background:#2A0508;
+  border-top: 1.5px solid var(--or);
+  padding-bottom: var(--safe-bottom);
+  flex-shrink:0;
+}
+.tab-btn {
+  flex:1; padding:9px 4px 8px; background:none; border:none;
+  color:rgba(201,168,76,0.45); font-size:10px;
+  font-family: Georgia, serif; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  transition:color 0.2s;
+}
+.tab-btn.active { color:var(--or); }
+.tab-btn .ti { font-size:20px; }
+
+/* ═══════════════════ CONTENT ═══════════════════ */
+.content { flex:1; overflow:hidden; background:var(--creme); position:relative; }
+.panel {
+  display:none; position:absolute; inset:0;
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+}
+.panel.active { display:block; }
+
+/* ═══════════════════ HISTOIRE ═══════════════════ */
+.hist-hero {
+  background: linear-gradient(160deg, #2A0508 0%, var(--rouge) 60%, #4A0C15 100%);
+  padding: 20px 16px 18px; text-align:center; color:var(--or-pale);
+  position: relative; overflow: hidden;
+}
+.hist-hero::before {
+  content:''; position:absolute; inset:0;
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 20px,
+    rgba(201,168,76,0.03) 20px, rgba(201,168,76,0.03) 21px
+  );
+}
+.hist-hero-badge {
+  display:inline-block; background:var(--or);
+  color:var(--rouge-dark); font-size:10px; font-weight:bold;
+  padding:3px 14px; border-radius:20px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:10px; position:relative;
+}
+.hist-hero h2 { font-size:20px; color:var(--or); margin-bottom:8px; position:relative; line-height:1.3; }
+.hist-hero p { font-size:12px; line-height:1.7; opacity:0.85; position:relative; max-width:320px; margin:0 auto; }
+
+.timeline { padding:16px 14px 24px; }
+.tl-item { display:flex; gap:10px; margin-bottom:18px; position:relative; }
+.tl-item::after {
+  content:''; position:absolute; left:34px; top:40px; bottom:-18px;
+  width:1px; background:linear-gradient(var(--or), transparent);
+  opacity:0.4;
+}
+.tl-item:last-child::after { display:none; }
+.tl-date {
+  flex-shrink:0; width:58px; text-align:center;
+  background:var(--rouge); color:var(--or); font-size:11px;
+  font-weight:bold; padding:6px 2px; border-radius:8px;
+  height:fit-content; line-height:1.4; border: 1px solid rgba(201,168,76,0.3);
+}
+.tl-card {
+  flex:1; background:white; border-radius:10px; padding:11px 12px;
+  box-shadow:0 2px 8px rgba(107,15,26,0.12);
+  border-left:3px solid var(--or);
+}
+.tl-card h3 { font-size:13px; color:var(--rouge); margin-bottom:4px; }
+.tl-card p { font-size:12px; color:#444; line-height:1.6; }
+
+/* ═══════════════════ SOCIÉTAIRES ═══════════════════ */
+.soc-head {
+  background:linear-gradient(180deg, #2A0508, var(--rouge-dark));
+  padding:12px 14px 10px;
+  position:sticky; top:0; z-index:10;
+}
+.soc-head h2 { color:var(--or); font-size:14px; margin-bottom:8px; }
+.epoque-scroll {
+  display:flex; gap:6px; overflow-x:auto; padding-bottom:2px;
+  scrollbar-width:none;
+}
+.epoque-scroll::-webkit-scrollbar { display:none; }
+.ep-btn {
+  flex-shrink:0; background:rgba(201,168,76,0.12);
+  border:1px solid rgba(201,168,76,0.35); color:rgba(232,201,122,0.8);
+  font-size:11px; padding:4px 11px; border-radius:14px;
+  cursor:pointer; font-family:Georgia, serif; transition:all 0.2s;
+  white-space:nowrap;
+}
+.ep-btn.active { background:var(--or); color:var(--rouge-dark); font-weight:bold; border-color:var(--or); }
+
+.membres-grid {
+  display:grid; grid-template-columns:repeat(2,1fr);
+  gap:10px; padding:10px 12px 80px;
+}
+.mb-card {
+  background:white; border-radius:12px; overflow:hidden;
+  box-shadow:0 2px 10px rgba(107,15,26,0.15); cursor:pointer;
+  transition:transform 0.15s, box-shadow 0.15s;
+}
+.mb-card:active { transform:scale(0.97); }
+.mb-photo-wrap {
+  width:100%; aspect-ratio:1; overflow:hidden;
+  background:linear-gradient(135deg, var(--rouge-dark), var(--rouge));
+  display:flex; align-items:center; justify-content:center;
+  font-size:38px; position:relative;
+}
+.mb-photo-wrap img {
+  width:100%; height:100%; object-fit:cover;
+  object-position:center top;
+  display:none;
+}
+.mb-photo-wrap img.loaded { display:block; }
+.mb-info {
+  padding:8px 7px;
+  background:linear-gradient(180deg, var(--rouge-dark), #220407);
+}
+.mb-name { font-size:11px; font-weight:bold; color:var(--or); text-align:center; line-height:1.3; }
+.mb-dates { font-size:10px; color:rgba(232,201,122,0.65); text-align:center; margin-top:2px; }
+
+/* ═══════════════════ MODAL ═══════════════════ */
+.modal-bg {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.72); z-index:200;
+  align-items:flex-end; padding-bottom:var(--safe-bottom);
+}
+.modal-bg.open { display:flex; }
+.modal-sheet {
+  background:var(--creme); border-radius:20px 20px 0 0;
+  width:100%; max-height:88vh;
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding-bottom:20px;
+}
+.modal-pill {
+  width:38px; height:4px; background:rgba(0,0,0,0.15);
+  border-radius:2px; margin:10px auto 0;
+}
+.modal-top {
+  display:flex; gap:14px; padding:14px 16px 14px;
+  border-bottom:1px solid rgba(107,15,26,0.12); align-items:flex-start;
+}
+.modal-img {
+  width:80px; height:80px; border-radius:12px; flex-shrink:0;
+  background:linear-gradient(135deg, var(--rouge-dark), var(--rouge));
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; overflow:hidden;
+}
+.modal-img img { width:100%; height:100%; object-fit:cover; object-position:center top; }
+.modal-info h2 { font-size:17px; color:var(--rouge); line-height:1.3; }
+.modal-role {
+  display:inline-block; background:var(--rouge); color:var(--or);
+  font-size:10px; padding:2px 9px; border-radius:8px; margin:5px 0 4px;
+  font-weight:bold; letter-spacing:0.5px;
+}
+.modal-dates { font-size:12px; color:#666; }
+.modal-body { padding:14px 16px 0; }
+.modal-body p { font-size:13px; line-height:1.75; color:#333; }
+.btn-modal-close {
+  position:fixed; bottom:calc(88vh + 6px + var(--safe-bottom));
+  right:14px; width:32px; height:32px; border-radius:50%;
+  background:rgba(107,15,26,0.85); border:none;
+  color:var(--or); font-size:16px; cursor:pointer; z-index:210;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ═══════════════════ QUIZ ═══════════════════ */
+.quiz-wrap { padding:14px 13px 80px; }
+.quiz-hdr {
+  background:linear-gradient(135deg, var(--rouge-dark), var(--rouge));
+  border-radius:16px; padding:16px; text-align:center; color:var(--or-pale);
+  margin-bottom:14px; position:relative; overflow:hidden;
+}
+.quiz-hdr::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(
+    -45deg, transparent, transparent 15px,
+    rgba(201,168,76,0.04) 15px, rgba(201,168,76,0.04) 16px
+  );
+}
+.quiz-hdr h2 { color:var(--or); font-size:18px; position:relative; }
+.quiz-hdr p { font-size:11px; opacity:0.75; margin-top:4px; position:relative; }
+.quiz-score { font-size:26px; font-weight:bold; color:var(--or); margin:6px 0 2px; position:relative; }
+
+.q-card {
+  background:white; border-radius:14px; padding:15px;
+  box-shadow:0 2px 10px rgba(107,15,26,0.12);
+  margin-bottom:12px;
+}
+.q-num { font-size:10px; color:var(--rouge); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.q-text { font-size:14px; font-weight:bold; color:var(--texte); line-height:1.55; margin-bottom:14px; }
+.ans-btn {
+  width:100%; text-align:left; padding:10px 13px; margin-bottom:7px;
+  border:2px solid #e2d4be; border-radius:10px;
+  background:var(--or-pale); font-size:13px; cursor:pointer;
+  font-family:Georgia,serif; color:var(--texte); transition:all 0.18s;
+  line-height:1.4;
+}
+.ans-btn:last-child { margin-bottom:0; }
+.ans-btn.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.ans-btn.wrong   { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.ans-btn:disabled { cursor:default; }
+
+.quiz-nav { display:flex; gap:9px; margin-top:12px; }
+.q-btn { flex:1; padding:11px; border:none; border-radius:12px; font-size:13px; font-family:Georgia,serif; cursor:pointer; font-weight:bold; }
+.q-btn:active { opacity:0.8; }
+.q-primary { background:var(--rouge); color:var(--or); }
+.q-secondary { background:var(--or); color:var(--rouge-dark); }
+
+.quiz-result {
+  background:white; border-radius:16px; padding:24px 20px;
+  text-align:center; box-shadow:0 2px 10px rgba(107,15,26,0.12);
+}
+.res-emoji { font-size:48px; margin-bottom:10px; }
+.res-title { font-size:20px; color:var(--rouge); font-weight:bold; margin-bottom:6px; }
+.res-score { font-size:15px; color:#555; margin-bottom:16px; }
+
+/* ═══════════════════ SETTINGS SHEET ═══════════════════ */
+.settings-bg {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.65); z-index:300;
+  align-items:flex-end; padding-bottom:var(--safe-bottom);
+}
+.settings-bg.open { display:flex; }
+.settings-sheet {
+  background:var(--creme); border-radius:20px 20px 0 0;
+  width:100%; max-height:70vh;
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding-bottom:20px;
+}
+.settings-pill { width:38px; height:4px; background:rgba(0,0,0,0.15); border-radius:2px; margin:10px auto 14px; }
+.settings-title { font-size:16px; color:var(--rouge); font-weight:bold; padding:0 16px 12px; border-bottom:1px solid rgba(107,15,26,0.12); }
+.settings-item {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; border-bottom:1px solid rgba(107,15,26,0.07); cursor:pointer;
+}
+.settings-item:last-child { border:none; }
+.settings-icon { font-size:22px; width:28px; text-align:center; }
+.settings-text { flex:1; }
+.settings-text strong { font-size:13px; color:var(--texte); display:block; }
+.settings-text span { font-size:11px; color:#888; }
+.settings-chevron { color:#bbb; font-size:14px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-mask">🎭</div>
+    <div class="header-text">
+      <div class="header-title">Comédie-Française</div>
+      <div class="header-subtitle">La Maison de Molière · 1680</div>
+    </div>
+    <button class="btn-settings" onclick="openSettings()">⚙️</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- HISTOIRE -->
+    <div class="panel active" id="panel-histoire">
+      <div class="hist-hero">
+        <div class="hist-hero-badge">Fondée en 1680</div>
+        <h2>La plus ancienne scène nationale du monde occidental</h2>
+        <p>Créée par ordonnance royale de Louis XIV, la Comédie-Française perpétue depuis plus de trois siècles la tradition vivante du théâtre classique français.</p>
+      </div>
+      <div class="timeline" id="timeline-container"></div>
+    </div>
+
+    <!-- SOCIÉTAIRES -->
+    <div class="panel" id="panel-sociétaires">
+      <div class="soc-head">
+        <h2>Sociétaires &amp; grandes figures</h2>
+        <div class="epoque-scroll" id="epoque-tabs"></div>
+      </div>
+      <div class="membres-grid" id="membres-grid"></div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="panel" id="panel-quiz">
+      <div class="quiz-wrap" id="quiz-wrap"></div>
+    </div>
+
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tabbar">
+    <button class="tab-btn active" onclick="switchTab('histoire',this)">
+      <span class="ti">📜</span><span>Histoire</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('sociétaires',this)">
+      <span class="ti">🎭</span><span>Membres</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('quiz',this)">
+      <span class="ti">❓</span><span>Quiz</span>
+    </button>
+  </div>
+
+</div>
+
+<!-- MODAL MEMBRE -->
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <button class="btn-modal-close" onclick="closeModalBtn()">✕</button>
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-pill"></div>
+    <div class="modal-top">
+      <div class="modal-img" id="modal-img">🎭</div>
+      <div class="modal-info">
+        <h2 id="modal-name">—</h2>
+        <span class="modal-role" id="modal-role">—</span>
+        <div class="modal-dates" id="modal-dates">—</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <p id="modal-bio">—</p>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="settings-bg" id="settings-bg" onclick="closeSettings(event)">
+  <div class="settings-sheet">
+    <div class="settings-pill"></div>
+    <div class="settings-title">À propos</div>
+    <div class="settings-item">
+      <span class="settings-icon">🏛️</span>
+      <div class="settings-text">
+        <strong>Comédie-Française</strong>
+        <span>Application culturelle — version 1.0</span>
+      </div>
+    </div>
+    <div class="settings-item">
+      <span class="settings-icon">📚</span>
+      <div class="settings-text">
+        <strong>Sources</strong>
+        <span>Données issues de Wikipédia (CC BY-SA)</span>
+      </div>
+    </div>
+    <div class="settings-item" onclick="openPrivacy()">
+      <span class="settings-icon">🔒</span>
+      <div class="settings-text">
+        <strong>Politique de confidentialité</strong>
+        <span>migapple.github.io</span>
+      </div>
+      <span class="settings-chevron">›</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════ DATA ═══════════
+
+const HISTOIRE = [
+  { date:"1680", titre:"Fondation par Louis XIV",
+    texte:"Par ordonnance royale du 21 octobre 1680, Louis XIV unit la troupe de l'Hôtel Guénégaud — héritière de la troupe de Molière — à celle de l'Hôtel de Bourgogne. Première troupe nationale permanente du monde occidental, la Comédie-Française naissait." },
+  { date:"1689", titre:"Installation rue des Fossés",
+    texte:"La troupe s'installe rue des Fossés-Saint-Germain-des-Prés dans un théâtre construit à cet effet, futur emplacement de l'Odéon actuel. Elle y joue pendant quatre-vingts ans le répertoire classique." },
+  { date:"1793", titre:"Scission révolutionnaire",
+    texte:"La Révolution française provoque une scission douloureuse : les acteurs républicains forment le Théâtre de la République, rue de Richelieu, tandis que les acteurs royalistes sont emprisonnés à la Force. Une page sombre de l'histoire de la maison." },
+  { date:"1799", titre:"Réunification napoléonienne",
+    texte:"Bonaparte réunit les factions et rétablit la Comédie-Française dans la salle du Palais-Royal. La troupe retrouve son unité et installe son siège définitif salle Richelieu, rue de Richelieu." },
+  { date:"1812", titre:"Le Décret de Moscou",
+    texte:"Depuis la campagne de Russie, Napoléon Ier promulgue le Décret de Moscou, véritable constitution de la maison. Il définit le statut des sociétaires, leurs droits et obligations — ce texte fondamental reste en partie en vigueur aujourd'hui." },
+  { date:"XIXe", titre:"L'âge d'or romantique",
+    texte:"Le XIXe siècle voit triompher Victor Hugo, Alfred de Musset et Alexandre Dumas. Rachel, puis Sarah Bernhardt incarnent la tragédie avec un génie incomparable, faisant rayonner la Comédie-Française dans le monde entier." },
+  { date:"1959", titre:"Sous l'aile de Malraux",
+    texte:"André Malraux, premier ministre des Affaires culturelles de De Gaulle, place la Comédie-Française sous la tutelle du ministère. L'institution devient un Établissement public national doté d'un statut modernisé." },
+  { date:"1993", titre:"Le Studio-Théâtre",
+    texte:"Une petite salle de 136 places ouvre sous les arcades du Palais-Royal. Le Studio-Théâtre accueille lectures, créations contemporaines et jeunes talents, renforçant le rayonnement de la maison en dehors du répertoire classique." },
+  { date:"2011", titre:"La Comédie-Française hors les murs",
+    texte:"Le Théâtre du Vieux-Colombier (6e arr.) devient la deuxième salle de la Comédie-Française, aux côtés de la salle Richelieu. L'institution se décline désormais sur trois lieux complémentaires dans Paris." },
+  { date:"2020", titre:"Le numérique, une révolution",
+    texte:"Fermée lors de la pandémie de Covid-19, la maison diffuse ses captations en streaming mondial gratuit, dont Le Misanthrope et Dom Juan, réunissant des millions de spectateurs. Une transformation durable pour le théâtre public français." },
+];
+
+const EPOQUES = [
+  { id:"tous",        label:"Tous" },
+  { id:"fondateurs",  label:"Fondateurs XVIIe" },
+  { id:"classiques",  label:"Classiques XXe" },
+  { id:"grandsnoms",  label:"Grandes figures" },
+  { id:"contemporains", label:"Contemporains" },
+];
+
+const MEMBRES = [
+  // — FONDATEURS —
+  { id:1, epoque:"fondateurs", prenom:"", nom:"Molière", dates:"1622–1673",
+    role:"Père fondateur", slug:"Molière",
+    bio:"De son vrai nom Jean-Baptiste Poquelin, Molière est le génie tutélaire de la Comédie-Française. Acteur, directeur de troupe et dramaturge incomparable, il est l'auteur du Tartuffe, de L'Avare, du Misanthrope et du Malade imaginaire. Sa troupe, après sa mort en scène en 1673, fusionna avec l'Hôtel de Bourgogne pour donner naissance à la Comédie-Française sept ans plus tard. La maison porte encore son surnom : La Maison de Molière." },
+
+  { id:2, epoque:"fondateurs", prenom:"Pierre", nom:"Corneille", dates:"1606–1684",
+    role:"Dramaturge fondateur", slug:"Pierre_Corneille",
+    bio:"Pierre Corneille est l'un des trois grands dramaturges du XVIIe siècle français. Auteur du Cid, de Cinna, de Polyeucte et d'Horace, il est considéré comme le père de la tragédie classique. Son héroïsme cornélien et sa maîtrise de la versification ont forgé un répertoire indissociable de la Comédie-Française dès sa fondation. Rival de Racine, il reste l'un des auteurs les plus joués de la maison." },
+
+  { id:3, epoque:"fondateurs", prenom:"Jean", nom:"Racine", dates:"1639–1699",
+    role:"Dramaturge fondateur", slug:"Jean_Racine",
+    bio:"Jean Racine porta la tragédie classique à son sommet avec Andromaque, Britannicus, Bérénice, Bajazet et Phèdre. Ses pièces constituent l'un des piliers absolus du répertoire du Français. Son style épuré, sa psychologie des passions et la musicalité de ses alexandrins restent un sommet de la littérature dramatique mondiale." },
+
+  // — CLASSIQUES XXe —
+  { id:4, epoque:"classiques", prenom:"Madeleine", nom:"Renaud", dates:"1900–1994",
+    role:"Sociétaire", slug:"Madeleine_Renaud",
+    bio:"Madeleine Renaud intégra la Comédie-Française en 1921 et en devint l'une des plus grandes et plus aimées sociétaires. Elle quitta la maison en 1946 avec son mari Jean-Louis Barrault pour fonder la célèbre Compagnie Renaud-Barrault, avec laquelle ils révolutionnèrent le théâtre français pendant quarante ans. Elle brilla aussi au cinéma sous la direction de Jean Grémillon et Marcel Carné." },
+
+  { id:5, epoque:"classiques", prenom:"Pierre", nom:"Fresnay", dates:"1897–1975",
+    role:"Sociétaire", slug:"Pierre_Fresnay",
+    bio:"Pierre Fresnay fut l'un des acteurs les plus élégants et raffinés de sa génération. Sociétaire de la Comédie-Française, il brilla également au cinéma dans la trilogie marseillaise de Marcel Pagnol (Marius, Fanny, César) et dans La Grande Illusion de Jean Renoir (1937). Il forma un couple artistique et privé avec la chanteuse et actrice Yvonne Printemps." },
+
+  { id:6, epoque:"classiques", prenom:"Pierre", nom:"Dux", dates:"1908–1990",
+    role:"Administrateur général", slug:"Pierre_Dux",
+    bio:"Pierre Dux fut à la fois grand acteur et administrateur général de la Comédie-Française (1970–1979). Sociétaire dès 1937, il joua les grands rôles du répertoire classique et moderne avec une autorité naturelle. À la tête de l'institution, il œuvra pour en moderniser la gestion tout en préservant ses traditions séculaires et sa vocation de service public." },
+
+  { id:7, epoque:"classiques", prenom:"Louis", nom:"Seigner", dates:"1903–1991",
+    role:"Doyen des sociétaires", slug:"Louis_Seigner",
+    bio:"Louis Seigner passa près de soixante ans à la Comédie-Française, dont il fut longtemps le doyen des sociétaires. Spécialiste irremplaçable des grands rôles comiques et des pères de comédie, il transmit son art à plusieurs générations. Sa fille Françoise Seigner fut aussi sociétaire, et sa petite-fille Emmanuelle Seigner est aujourd'hui une grande star du cinéma." },
+
+  { id:8, epoque:"classiques", prenom:"Jean-Louis", nom:"Barrault", dates:"1910–1994",
+    role:"Sociétaire & metteur en scène", slug:"Jean-Louis_Barrault",
+    bio:"Jean-Louis Barrault fut l'une des figures les plus polyvalentes du théâtre français du XXe siècle : acteur, mime, metteur en scène et directeur de compagnie. Son incarnation du mime Baptiste dans Les Enfants du Paradis de Marcel Carné (1945) reste une performance légendaire du cinéma mondial. Avec Madeleine Renaud, sa femme, il anima la Compagnie Renaud-Barrault pendant quarante ans." },
+
+  // — GRANDES FIGURES —
+  { id:9, epoque:"grandsnoms", prenom:"Jacques", nom:"Charon", dates:"1920–1975",
+    role:"Sociétaire", slug:"Jacques_Charon_(acteur)",
+    bio:"Jacques Charon fut l'un des grands acteurs et metteurs en scène comiques de la Comédie-Française. Sociétaire à partir de 1954, il se spécialisa dans le répertoire de Molière et les comédies de Marivaux, y ajoutant son propre sens du rythme et de la fantaisie. Il mit en scène des pièces aussi bien à Paris qu'à Broadway et à Londres, portant le répertoire français à l'international." },
+
+  { id:10, epoque:"grandsnoms", prenom:"Robert", nom:"Manuel", dates:"1916–1995",
+    role:"Sociétaire", slug:"Robert_Manuel_(acteur_français)",
+    bio:"Robert Manuel fut sociétaire de la Comédie-Française et acteur de cinéma apprécié. Il est notamment célèbre pour son rôle dans Rififi de Jules Dassin (1955), film noir devenu culte dans le monde entier. Sa carrière illustre la porosité entre les planches du Français et les plateaux de cinéma, une double vie artistique caractéristique de sa génération." },
+
+  { id:11, epoque:"grandsnoms", prenom:"Robert", nom:"Hirsch", dates:"1925–2017",
+    role:"Sociétaire honoraire", slug:"Robert_Hirsch_(acteur)",
+    bio:"Robert Hirsch fut l'un des acteurs les plus éclectiques et les plus doués de sa génération à la Comédie-Française. Capable de passer de la comédie la plus bouffonne à la tragédie la plus noire, il impressionna dans des rôles très variés. Il reçut le Molière du comédien en 1987 et fut souvent cité comme l'un des plus grands acteurs français du XXe siècle." },
+
+  { id:12, epoque:"grandsnoms", prenom:"Georges", nom:"Descrières", dates:"1930–2013",
+    role:"Sociétaire honoraire", slug:"Georges_Descrières",
+    bio:"Georges Descrières fut sociétaire de la Comédie-Française et brilla dans les grands rôles classiques avec une élégance naturelle. Il est également connu du grand public pour avoir incarné le génial cambrioleur Arsène Lupin dans la célébrissime série télévisée des années 1970, diffusée dans le monde entier et qui reste la référence absolue du personnage." },
+
+  { id:13, epoque:"grandsnoms", prenom:"Michel", nom:"Duchaussoy", dates:"1938–2012",
+    role:"Sociétaire", slug:"Michel_Duchaussoy",
+    bio:"Michel Duchaussoy fut un acteur puissant et sensible, pilier de la Comédie-Française et star du cinéma d'auteur. Il laissa des compositions mémorables dans Que la bête meure (1969) de Claude Chabrol, film policier d'une noirceur magistrale. Alternant classiques au théâtre et films d'auteur au cinéma, il incarna une certaine idée de la profondeur dramatique française." },
+
+  { id:14, epoque:"grandsnoms", prenom:"Francis", nom:"Huster", dates:"1947–",
+    role:"Sociétaire honoraire", slug:"Francis_Huster",
+    bio:"Francis Huster fut l'un des jeunes premiers les plus éclatants de la Comédie-Française dans les années 1970–80. Interprète ardent de Racine, Corneille et Molière, il marqua toute une génération. Après avoir quitté la troupe, il a poursuivi une carrière indépendante de comédien et de metteur en scène, restant une figure incontournable du théâtre privé parisien." },
+
+  { id:15, epoque:"grandsnoms", prenom:"Jeanne", nom:"Moreau", dates:"1928–2017",
+    role:"Pensionnaire", slug:"Jeanne_Moreau",
+    bio:"Jeanne Moreau débuta au Conservatoire avant d'entrer à la Comédie-Française, qu'elle quitta pour conquérir le cinéma mondial. Muse incontestée de la Nouvelle Vague — Jules et Jim de Truffaut (1962), Ascenseur pour l'échafaud de Louis Malle (1958) — elle incarna l'intelligence et la liberté féminines. Réalisatrice, chanteuse, présidente du jury de Cannes, elle fut une figure universelle de la culture française." },
+
+  { id:16, epoque:"grandsnoms", prenom:"Michel", nom:"Galabru", dates:"1922–2016",
+    role:"Pensionnaire", slug:"Michel_Galabru",
+    bio:"Michel Galabru, formé au Conservatoire national, fut un comédien d'une extraordinaire polyvalence sur six décennies de carrière. S'il est célèbre pour la série des Gendarmes avec Louis de Funès, il donna aussi la pleine mesure de son talent dramatique dans Le Juge et l'Assassin (1976) de Bertrand Tavernier, pour lequel il fut César du meilleur acteur." },
+
+  { id:17, epoque:"grandsnoms", prenom:"Annie", nom:"Girardot", dates:"1931–2011",
+    role:"Pensionnaire", slug:"Annie_Girardot",
+    bio:"Annie Girardot débuta à la Comédie-Française avant de devenir l'une des actrices les plus populaires et les plus célébrées du cinéma français. Muse de Luchino Visconti dans Rocco et ses frères (1960), elle reçut trois César (1977, 1996, 2002) et le César d'honneur en 2010. Sa sincérité, sa générosité et sa présence unique en firent une actrice que le public aima profondément." },
+
+  { id:18, epoque:"grandsnoms", prenom:"Catherine", nom:"Hiegel", dates:"1946–",
+    role:"Sociétaire honoraire", slug:"Catherine_Hiegel",
+    bio:"Catherine Hiegel est l'une des grandes dames de la Comédie-Française, qu'elle intégra en 1969 et où elle gravit tous les échelons jusqu'au rang de doyenne. Spécialiste des rôles féminins forts du répertoire classique — Molière, Racine, Marivaux — elle s'y est imposée avec une autorité, une finesse et un naturel exemplaires sur plus de quarante ans de présence à la maison." },
+
+  { id:19, epoque:"grandsnoms", prenom:"Jean-Luc", nom:"Bideau", dates:"1940–",
+    role:"Associé", slug:"Jean-Luc_Bideau",
+    bio:"Jean-Luc Bideau est un acteur suisse francophone qui a collaboré avec la Comédie-Française tout en bâtissant une carrière internationale de premier plan. Figure centrale du cinéma de la Nouvelle Vague suisse, il est la star des films d'Alain Tanner (Jonas, Dans la ville blanche). Sa présence intense et son intelligence dramatique en font un acteur du monde francophone dans toute son amplitude." },
+
+  // — CONTEMPORAINS —
+  { id:20, epoque:"contemporains", prenom:"Philippe", nom:"Torreton", dates:"1965–",
+    role:"Ancien sociétaire", slug:"Philippe_Torreton",
+    bio:"Philippe Torreton fut sociétaire de la Comédie-Française avant de connaître une carrière cinématographique couronnée de deux César : Meilleur Acteur pour Capitaine Conan de Bertrand Tavernier (1996) et Ça commence aujourd'hui du même réalisateur (1997). Acteur engagé politiquement, il est aussi auteur de récits autobiographiques et de chroniques citoyennes remarquées." },
+
+  { id:21, epoque:"contemporains", prenom:"Denis", nom:"Podalydès", dates:"1963–",
+    role:"Sociétaire", slug:"Denis_Podalydès",
+    bio:"Denis Podalydès est sociétaire de la Comédie-Française depuis 1997 et l'une de ses figures les plus emblématiques et les plus aimées. Acteur shakespearien, molièresque et racinien, il est aussi réalisateur et écrivain. Il incarna Nicolas Sarkozy dans La Conquête (2011) de Xavier Durringer. En 2022, il a été élu membre de l'Académie française, consacrant une carrière d'exception." },
+
+  { id:22, epoque:"contemporains", prenom:"Michel", nom:"Vuillermoz", dates:"1963–",
+    role:"Sociétaire", slug:"Michel_Vuillermoz",
+    bio:"Michel Vuillermoz est sociétaire de la Comédie-Française depuis 1995, l'une des figures les plus fidèles et les plus solides de la troupe. Acteur d'une grande finesse dans les textes classiques comme dans la création contemporaine, il est aussi apprécié au cinéma dans des seconds rôles mémorables chez Costa-Gavras ou Étienne Chatiliez." },
+
+  { id:23, epoque:"contemporains", prenom:"Dominique", nom:"Blanc", dates:"1956–",
+    role:"Sociétaire honoraire", slug:"Dominique_Blanc_(actrice)",
+    bio:"Dominique Blanc est l'une des actrices françaises les plus récompensées de sa génération, avec trois César. Formée à la Comédie-Française, elle est la muse d'Alain Resnais — On connaît la chanson, Pas sur la bouche, Les Herbes folles — et a joué sous la direction des plus grands metteurs en scène de théâtre européens. Sa maîtrise du texte et son expressivité intérieure sont uniques." },
+
+  { id:24, epoque:"contemporains", prenom:"Marina", nom:"Hands", dates:"1975–",
+    role:"Pensionnaire", slug:"Marina_Hands",
+    bio:"Marina Hands, fille du grand metteur en scène anglais Terry Hands, est franco-britannique et a été formée au Conservatoire national supérieur d'art dramatique. Elle a remporté le César de la meilleure actrice en 2008 pour Lady Chatterley de Pascale Ferran, incarnation sensuelle et lumineuse. Sa carrière mêle théâtre classique exigeant et cinéma d'auteur international." },
+
+  { id:25, epoque:"contemporains", prenom:"Pierre", nom:"Niney", dates:"1989–",
+    role:"Ancien pensionnaire", slug:"Pierre_Niney",
+    bio:"Pierre Niney intégra la Comédie-Française en 2010 comme pensionnaire avant de connaître une carrière cinématographique fulgurante. Son César du Meilleur Acteur en 2015 pour Yves Saint Laurent (2014) de Jalil Lespert, où il incarne le couturier avec une justesse saisissante, confirma son statut de grande star de la nouvelle génération du cinéma français." },
+
+  { id:26, epoque:"contemporains", prenom:"Laurent", nom:"Lafitte", dates:"1973–",
+    role:"Sociétaire", slug:"Laurent_Lafitte",
+    bio:"Laurent Lafitte est sociétaire de la Comédie-Française depuis 2007 et l'une de ses figures les plus populaires. Acteur comique et dramatique, il a connu un succès international remarquable au cinéma : Elle de Paul Verhoeven (2016), et Coup de chance de Woody Allen (2023). Son aisance naturelle et sa polyvalence en font une star du Français et du grand écran." },
+
+  { id:27, epoque:"contemporains", prenom:"Isabelle", nom:"Adjani", dates:"1955–",
+    role:"Ancienne pensionnaire", slug:"Isabelle_Adjani",
+    bio:"Isabelle Adjani entra à la Comédie-Française à dix-sept ans seulement, jouant notamment Agnès dans L'École des femmes de Molière avec une grâce qui impressionna le monde du théâtre. Elle quitta rapidement la troupe pour une carrière internationale d'exception — cinq César, record absolu — incarnant Adèle Hugo, Camille Claudel et la Reine Margot avec une intensité bouleversante." },
+
+  { id:28, epoque:"contemporains", prenom:"Jeanne", nom:"Balibar", dates:"1968–",
+    role:"Ancienne pensionnaire", slug:"Jeanne_Balibar",
+    bio:"Jeanne Balibar a été pensionnaire de la Comédie-Française avant de s'imposer comme l'une des actrices les plus originales et les plus intellectuellement exigeantes de sa génération. Actrice fétiche de Jacques Rivette et de Christophe Honoré, elle est également chanteuse et musicienne. Son parcours éclectique et inclassable en fait une figure à part dans le paysage culturel français." },
+
+  { id:29, epoque:"contemporains", prenom:"Richard", nom:"Berry", dates:"1950–",
+    role:"Associé", slug:"Richard_Berry_(acteur)",
+    bio:"Richard Berry a débuté au théâtre classique avant de devenir une star du cinéma populaire français. Acteur polyvalent, connu pour ses rôles dans des thrillers et des comédies populaires, il est également réalisateur — Je préfère qu'on reste amis, Le Déménagement. Son talent naturel et sa longévité témoignent d'une capacité à traverser les genres et les générations." },
+
+  { id:30, epoque:"contemporains", prenom:"Guillaume", nom:"Gallienne", dates:"1972–",
+    role:"Sociétaire", slug:"Guillaume_Gallienne",
+    bio:"Guillaume Gallienne est sociétaire de la Comédie-Française et l'un de ses acteurs les plus aimés du public. Son film autobiographique Les Garçons et Guillaume, à table ! (2013), dans lequel il joue à la fois lui-même et sa propre mère, a remporté cinq César dont Meilleur Film, un exploit rarissime. Acteur de composition et metteur en scène, il incarne une Comédie-Française ouverte sur le monde." },
+
+  { id:31, epoque:"contemporains", prenom:"Samuel", nom:"Le Bihan", dates:"1965–",
+    role:"Associé", slug:"Samuel_Le_Bihan",
+    bio:"Samuel Le Bihan a fréquenté les planches avant de percer au cinéma populaire. Révélé dans Karnaval (1998) de Thomas Vincent — Prix Jean Vigo — il est connu du grand public pour Le Pacte des loups (2001) de Christophe Gans et la série télévisée Section de recherches. Acteur physique et intense, il incarne un visage populaire du théâtre et du cinéma d'action français." },
+];
+
+const QUIZ = [
+  { q:"En quelle année la Comédie-Française a-t-elle été fondée ?",
+    a:["1650","1680","1720","1789"], c:1 },
+  { q:"Quel surnom populaire désigne la Comédie-Française, en hommage à son fondateur spirituel ?",
+    a:["La Maison du Roi","La Scène nationale","La Maison de Molière","Le Théâtre de France"], c:2 },
+  { q:"Quel roi de France a fondé la Comédie-Française par ordonnance royale ?",
+    a:["Louis XIII","Henri IV","Louis XV","Louis XIV"], c:3 },
+  { q:"Dans quel arrondissement de Paris se trouve la salle Richelieu, siège principal de la Comédie-Française ?",
+    a:["4e arrondissement","8e arrondissement","1er arrondissement","6e arrondissement"], c:2 },
+  { q:"Madeleine Renaud était la femme de quel grand acteur et metteur en scène de théâtre ?",
+    a:["Louis Jouvet","Jean-Louis Barrault","Jean Vilar","Sacha Guitry"], c:1 },
+  { q:"Guillaume Gallienne a remporté cinq César pour quel film où il joue à la fois lui-même et sa propre mère ?",
+    a:["Dans la maison","Mon roi","Les Garçons et Guillaume, à table !","Le Grand Bain"], c:2 },
+  { q:"Pierre Corneille est l'auteur de quelle célèbre pièce du XVIIe siècle souvent jouée à la Comédie-Française ?",
+    a:["Phèdre","Tartuffe","Andromaque","Le Cid"], c:3 },
+  { q:"Quelle actrice de la liste a incarné Camille Claudel dans le film éponyme de Bruno Nuytten (1988) ?",
+    a:["Jeanne Moreau","Marina Hands","Isabelle Adjani","Dominique Blanc"], c:2 },
+  { q:"Denis Podalydès incarne quel président de la République dans le film 'La Conquête' (2011) ?",
+    a:["François Hollande","Jacques Chirac","Valéry Giscard d'Estaing","Nicolas Sarkozy"], c:3 },
+  { q:"Quel auteur classique a écrit 'Andromaque', 'Phèdre' et 'Bérénice', piliers du répertoire du Français ?",
+    a:["Corneille","Molière","Marivaux","Racine"], c:3 },
+  { q:"Pierre Niney a remporté le César du Meilleur Acteur en 2015 pour avoir incarné quel personnage ?",
+    a:["Jean Cocteau","Albert Camus","Yves Saint Laurent","Serge Gainsbourg"], c:2 },
+  { q:"Quel acteur de la liste est célèbre pour ses rôles de gendarme Gerber dans la série de films comiques avec Louis de Funès ?",
+    a:["Louis Seigner","Robert Manuel","Michel Galabru","Robert Hirsch"], c:2 },
+];
+
+// ═══════════ WIKI PHOTOS ═══════════
+const CACHE_KEY = 'cf_wiki_v1';
+let photoCache = {};
+try { photoCache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch(e){}
+
+async function fetchWikiPhoto(slug) {
+  if (photoCache[slug] !== undefined) return photoCache[slug];
+  try {
+    const r = await fetch(`https://fr.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(slug)}`);
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    const url = d.thumbnail ? d.thumbnail.source : '';
+    photoCache[slug] = url;
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(photoCache)); } catch(e){}
+    return url;
+  } catch(e) {
+    photoCache[slug] = '';
+    return '';
+  }
+}
+
+// ═══════════ RENDER HISTOIRE ═══════════
+function renderHistoire() {
+  const c = document.getElementById('timeline-container');
+  c.innerHTML = HISTOIRE.map(h => `
+    <div class="tl-item">
+      <div class="tl-date">${h.date}</div>
+      <div class="tl-card">
+        <h3>${h.titre}</h3>
+        <p>${h.texte}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════ RENDER MEMBRES ═══════════
+let currentEpoque = 'tous';
+function renderEpoqueTabs() {
+  const c = document.getElementById('epoque-tabs');
+  c.innerHTML = EPOQUES.map(e => `
+    <button class="ep-btn ${e.id===currentEpoque?'active':''}"
+      onclick="filterEpoque('${e.id}')">${e.label}</button>
+  `).join('');
+}
+
+function filterEpoque(id) {
+  currentEpoque = id;
+  renderEpoqueTabs();
+  renderMembresGrid();
+}
+
+function renderMembresGrid() {
+  const list = currentEpoque==='tous' ? MEMBRES : MEMBRES.filter(m=>m.epoque===currentEpoque);
+  const g = document.getElementById('membres-grid');
+  g.innerHTML = list.map(m => `
+    <div class="mb-card" onclick="openModal(${m.id})">
+      <div class="mb-photo-wrap" id="photo-${m.id}">🎭
+        <img id="img-${m.id}" alt="${m.prenom} ${m.nom}" onload="this.classList.add('loaded')" onerror="this.style.display='none'">
+      </div>
+      <div class="mb-info">
+        <div class="mb-name">${m.prenom ? m.prenom+' ' : ''}${m.nom}</div>
+        <div class="mb-dates">${m.dates}</div>
+      </div>
+    </div>
+  `).join('');
+  // Load photos
+  list.forEach(m => loadPhoto(m));
+}
+
+function loadPhoto(m) {
+  const img = document.getElementById('img-'+m.id);
+  if (!img) return;
+  if (photoCache[m.slug] !== undefined) {
+    if (photoCache[m.slug]) { img.src = photoCache[m.slug]; }
+    return;
+  }
+  fetchWikiPhoto(m.slug).then(url => {
+    if (url && img) { img.src = url; }
+  });
+}
+
+// ═══════════ MODAL ═══════════
+function openModal(id) {
+  const m = MEMBRES.find(x=>x.id===id);
+  if (!m) return;
+  document.getElementById('modal-name').textContent = (m.prenom?m.prenom+' ':'')+m.nom;
+  document.getElementById('modal-role').textContent = m.role;
+  document.getElementById('modal-dates').textContent = m.dates;
+  document.getElementById('modal-bio').textContent = m.bio;
+  // Photo
+  const wrap = document.getElementById('modal-img');
+  wrap.innerHTML = '🎭';
+  if (photoCache[m.slug]) {
+    const img = document.createElement('img');
+    img.src = photoCache[m.slug];
+    img.style.cssText='width:100%;height:100%;object-fit:cover;object-position:center top;border-radius:12px;';
+    wrap.innerHTML=''; wrap.appendChild(img);
+  } else if (photoCache[m.slug] === undefined) {
+    fetchWikiPhoto(m.slug).then(url => {
+      if (url) {
+        const img = document.createElement('img');
+        img.src = url;
+        img.style.cssText='width:100%;height:100%;object-fit:cover;object-position:center top;border-radius:12px;';
+        const w = document.getElementById('modal-img');
+        if (w) { w.innerHTML=''; w.appendChild(img); }
+      }
+    });
+  }
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target===document.getElementById('modal-bg')) closeModalBtn();
+}
+function closeModalBtn() {
+  document.getElementById('modal-bg').classList.remove('open');
+}
+
+// ═══════════ QUIZ ═══════════
+let qi = 0, score = 0, answered = false;
+function renderQuiz() {
+  const wrap = document.getElementById('quiz-wrap');
+  if (qi >= QUIZ.length) { renderResult(wrap); return; }
+  const q = QUIZ[qi]; answered = false;
+  wrap.innerHTML = `
+    <div class="quiz-hdr">
+      <h2>Quiz · La Maison de Molière</h2>
+      <p>Testez votre connaissance de la Comédie-Française</p>
+      <div class="quiz-score">${score} / ${qi}</div>
+    </div>
+    <div class="q-card">
+      <div class="q-num">Question ${qi+1} sur ${QUIZ.length}</div>
+      <div class="q-text">${q.q}</div>
+      ${q.a.map((a,i) => `
+        <button class="ans-btn" id="ans-${i}" onclick="checkAnswer(${i},${q.c})">${a}</button>
+      `).join('')}
+    </div>
+    <div class="quiz-nav">
+      <button class="q-btn q-secondary" onclick="skipQ()">Passer</button>
+    </div>
+  `;
+}
+function checkAnswer(i, c) {
+  if (answered) return; answered = true;
+  if (i===c) score++;
+  for (let k=0;k<QUIZ[qi].a.length;k++) {
+    const b = document.getElementById('ans-'+k);
+    if (b) { b.disabled=true; if(k===c) b.classList.add('correct'); else if(k===i) b.classList.add('wrong'); }
+  }
+  setTimeout(nextQ, 900);
+}
+function nextQ() { qi++; renderQuiz(); }
+function skipQ()  { nextQ(); }
+function renderResult(wrap) {
+  const pct = Math.round(score/QUIZ.length*100);
+  let emoji='🎭', title='Bonne tentative !', msg='Continuez à explorer la maison de Molière.';
+  if (pct>=90) { emoji='🏆'; title='Bravo, virtuose !'; msg='Vous connaissez la Comédie-Française sur le bout des doigts !'; }
+  else if (pct>=70) { emoji='🌟'; title='Très bien joué !'; msg='Vous maîtrisez bien l\'histoire de la maison.'; }
+  else if (pct>=50) { emoji='👏'; title='Pas mal !'; msg='Quelques révisions et vous serez incollable.'; }
+  wrap.innerHTML = `
+    <div class="quiz-hdr">
+      <h2>Quiz · La Maison de Molière</h2>
+      <p>Résultat final</p>
+      <div class="quiz-score">${score} / ${QUIZ.length}</div>
+    </div>
+    <div class="quiz-result">
+      <div class="res-emoji">${emoji}</div>
+      <div class="res-title">${title}</div>
+      <div class="res-score">Vous avez obtenu ${score} bonne${score>1?'s':''} réponse${score>1?'s':''} sur ${QUIZ.length} (${pct}%)</div>
+      <button class="q-btn q-primary" onclick="restartQuiz()" style="margin-top:8px;">Rejouer</button>
+    </div>
+  `;
+}
+function restartQuiz() { qi=0; score=0; answered=false; renderQuiz(); }
+
+// ═══════════ TABS ═══════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id==='quiz' && qi===0 && document.getElementById('quiz-wrap').innerHTML==='') renderQuiz();
+}
+
+// ═══════════ SETTINGS ═══════════
+function openSettings()  { document.getElementById('settings-bg').classList.add('open'); }
+function closeSettings(e){ if(e.target===document.getElementById('settings-bg')) document.getElementById('settings-bg').classList.remove('open'); }
+function openPrivacy()   { window.open('https://migapple.github.io','_system'); }
+
+// ═══════════ INIT ═══════════
+renderHistoire();
+renderEpoqueTabs();
+renderMembresGrid();
+renderQuiz();
+</script>
+</body>
+</html>
